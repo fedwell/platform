@@ -1,0 +1,342 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "FedWell Platform API"
+  description: "This is the standard API provided by the Fedwell Platform"
+
+servers:
+  - url: http://localhost:50000
+  - url: http://localhost:60000
+
+components:
+  schemas:
+    TokenAdd:
+      type: "object"
+      properties:
+        type:
+          type: "string"
+        name:
+          type: "string"
+    TokenGet:
+      type: "object"
+      properties:
+        type:
+          type: "string"
+        name:
+          type: "string"
+        uuid:
+          description: "UUID of the Token"
+          type: "string"
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+
+    Rule:
+      type: "object"
+      properties:
+        type:
+          type: "string"
+        name:
+          type: "string"
+        uuid:
+          description: "UUID of the Rule"
+          type: "string"
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+    UUIDMapping:
+      type: "object"
+      additionalProperties:
+          type: "string"
+      example:
+        f5d4a196-67ef-4eb9-8612-e03aba78ef9b: Object-Name-1
+        741ae05a-5e2c-444e-bb97-4c576009e77d: Object-Name-2
+        dc524d14-64c2-477c-b43e-7aa48358db70: Object-Name-3
+
+    Edge:
+      type: "object"
+      properties:
+        uuid:
+          description: "UUID of the Edge"
+          type: "string"
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        parent:
+          description: "UUID of the Parent Node (KB Token)"
+          type: "string"
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        child:
+          description: "UUID of the Child Node (KB Token)"
+          type: "string"
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        label:
+          description: "label of the edge"
+          type: "string"
+  
+        
+paths:
+  /blackboard/active:
+    get:
+      summary: gets all active tokens
+      description: ''
+      tags:
+       - Blackboard
+      operationId: BlackboardGetActive
+      responses:
+        '200':
+          description: Default sample response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenGet'
+                  
+  /blackboard/archived:
+    get:
+      summary: gets all archived tokens
+      description: ''
+      tags:
+       - Blackboard
+      operationId: BlackboardGetArchived
+      responses:
+        '200':
+          description: Default sample response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenGet'
+                  
+  /blackboard/addToken:
+    post:
+      summary: adds a token to the blackboard
+      description: ''
+      tags:
+       - Blackboard
+      operationId: BlackboardAddToken
+      requestBody:
+        description: Token to add to the blackboard
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenAdd'
+      responses:
+        '200':
+          description: Default error sample response
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  result:
+                    type: "boolean"
+                  
+  /blackboard/rules:
+    get:
+      summary: get all rules
+      description: ''
+      tags:
+       - Blackboard
+      operationId: BlackboardGetRules
+      responses:
+        '200':
+          description: Default sample response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+  
+  /kb/instances/mapping:
+    get:
+      summary: get all instances with their uuid
+      description: ''
+      tags:
+       - Blackboard
+      operationId: KBGetInstancesMapping
+      responses:
+        '200':
+          description: Default sample response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UUIDMapping'
+                  
+  /kb/types/mapping:
+    get:
+      summary: get all types with their uuid
+      description: ''
+      tags:
+       - Blackboard
+      operationId: KBGetTypesMapping
+      responses:
+        '200':
+          description: Default sample response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UUIDMapping'
+
+  /kb/graph/{graphName}/getEdges:
+    get:
+      summary: get all the edges from the specified graph
+      description: ''
+      tags:
+        - Graph
+      parameters:
+        - in: path
+          name: graphName
+          schema:
+            type: string
+          required: true
+          description: Name of the Graph
+      operationId: GraphGetEdges
+      responses:
+        '200':
+          description: Edges returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Edge'
+
+  /kb/graph/addEdge:
+    post:
+      summary: adds an Edge to the specified graph
+      description: ''
+      tags:
+        - Graph
+      operationId: GraphAddEdge
+      requestBody:
+        description: graph name, UUID of KB Token it is coming out of(source), UUID of KB Token it is going into(goal), label (optional)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                graphName:
+                  type: "string"
+                parent:
+                  description: "UUID of the KB Token coming out of"
+                  type: "string"
+                  format: uuid
+                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                  minLength: 36
+                  maxLength: 36
+                child:
+                  description: "UUID of the KB Token going into"
+                  type: "string"
+                  format: uuid
+                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                  minLength: 36
+                  maxLength: 36
+                label:
+                  description: "label of the created edge (optional)"
+                  type: "string"
+      responses:
+        '200':
+          description: Edge added
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  result:
+                    type: "boolean"
+
+  /kb/graph/removeEdge:
+    post:
+      summary: removes the specified edge from the specified graph
+      description: ''
+      tags:
+        - Graph
+      operationId: GraphRemoveEdge
+      requestBody:
+        description: graph name, UUID of the edge to be deleted
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                graphName:
+                  type: "string"
+                UUID:
+                  description: "UUID of the Edge"
+                  type: "string"
+                  format: uuid
+                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                  minLength: 36
+                  maxLength: 36
+      responses:
+        '200':
+          description: Edge removed
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  result:
+                    type: "boolean"
+
+  /kb/graph/addGraph:
+    post:
+      summary: adds a new (empty) graph to the blackboard
+      description: ''
+      tags:
+        - Graph
+      operationId: GraphAddGraph
+      requestBody:
+        description: graphName of the new Graph
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                graphName:
+                  type: "string"
+
+      responses:
+        '200':
+          description: Graph added
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  result:
+                    type: "boolean"
+
+  /kb/graph/getGraphNames:
+    get:
+      summary: returns all the names of the graphs
+      description: ''
+      tags:
+        - Graph
+      operationId: GraphGetGraphNames
+      responses:
+        '200':
+          description: Graph names returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: "string"
