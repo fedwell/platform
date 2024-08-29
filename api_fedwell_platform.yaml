@@ -1,342 +1,491 @@
-openapi: "3.0.0"
+openapi: 3.0.3
 info:
-  version: "1.0.0"
-  title: "FedWell Platform API"
-  description: "This is the standard API provided by the Fedwell Platform"
-
+  title: FedWell Platform - OpenAPI 3.0
+  description: |-
+    This is the first approach of the API of the Fedwell Platform based on the OpenAPI 3.0 specification.
+  version: 1.0.0
 servers:
-  - url: http://localhost:50000
-  - url: http://localhost:60000
-
-components:
-  schemas:
-    TokenAdd:
-      type: "object"
-      properties:
-        type:
-          type: "string"
-        name:
-          type: "string"
-    TokenGet:
-      type: "object"
-      properties:
-        type:
-          type: "string"
-        name:
-          type: "string"
-        uuid:
-          description: "UUID of the Token"
-          type: "string"
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-
-    Rule:
-      type: "object"
-      properties:
-        type:
-          type: "string"
-        name:
-          type: "string"
-        uuid:
-          description: "UUID of the Rule"
-          type: "string"
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-    UUIDMapping:
-      type: "object"
-      additionalProperties:
-          type: "string"
-      example:
-        f5d4a196-67ef-4eb9-8612-e03aba78ef9b: Object-Name-1
-        741ae05a-5e2c-444e-bb97-4c576009e77d: Object-Name-2
-        dc524d14-64c2-477c-b43e-7aa48358db70: Object-Name-3
-
-    Edge:
-      type: "object"
-      properties:
-        uuid:
-          description: "UUID of the Edge"
-          type: "string"
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        parent:
-          description: "UUID of the Parent Node (KB Token)"
-          type: "string"
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        child:
-          description: "UUID of the Child Node (KB Token)"
-          type: "string"
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        label:
-          description: "label of the edge"
-          type: "string"
-  
-        
+  - url: https://localhost/api/v3
+tags:
+  - name: patient
+    description: Operations about a patient
+  - name: physiotherapist
+    description: Operations about a physiotherapist
+  - name: excercise
+    description: Operations about an exercise
 paths:
-  /blackboard/active:
-    get:
-      summary: gets all active tokens
-      description: ''
-      tags:
-       - Blackboard
-      operationId: BlackboardGetActive
-      responses:
-        '200':
-          description: Default sample response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TokenGet'
-                  
-  /blackboard/archived:
-    get:
-      summary: gets all archived tokens
-      description: ''
-      tags:
-       - Blackboard
-      operationId: BlackboardGetArchived
-      responses:
-        '200':
-          description: Default sample response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TokenGet'
-                  
-  /blackboard/addToken:
+  /patient:
     post:
-      summary: adds a token to the blackboard
-      description: ''
       tags:
-       - Blackboard
-      operationId: BlackboardAddToken
+        - patient
+      summary: Create patient
+      description: This can only be done by the logged in user.
+      operationId: createPatient
       requestBody:
-        description: Token to add to the blackboard
-        required: true
+        description: Created patient object
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenAdd'
+              $ref: '#/components/schemas/Patient'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
       responses:
-        '200':
-          description: Default error sample response
+        default:
+          description: successful operation
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  result:
-                    type: "boolean"
-                  
-  /blackboard/rules:
-    get:
-      summary: get all rules
-      description: ''
+                $ref: '#/components/schemas/Patient'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Patient'
+  /patient/createWithList:
+    post:
       tags:
-       - Blackboard
-      operationId: BlackboardGetRules
+        - patient
+      summary: Creates list of patients with given input array
+      description: Creates list of patients with given input array
+      operationId: createPatientWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Patient'
       responses:
         '200':
-          description: Default sample response
+          description: Successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Rule'
-  
-  /kb/instances/mapping:
-    get:
-      summary: get all instances with their uuid
-      description: ''
-      tags:
-       - Blackboard
-      operationId: KBGetInstancesMapping
-      responses:
-        '200':
-          description: Default sample response
-          content:
-            application/json:
+                $ref: '#/components/schemas/Patient'          
+            application/xml:
               schema:
-                $ref: '#/components/schemas/UUIDMapping'
-                  
-  /kb/types/mapping:
+                $ref: '#/components/schemas/Patient'
+        default:
+          description: successful operation
+  /patient/login:
     get:
-      summary: get all types with their uuid
-      description: ''
       tags:
-       - Blackboard
-      operationId: KBGetTypesMapping
-      responses:
-        '200':
-          description: Default sample response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UUIDMapping'
-
-  /kb/graph/{graphName}/getEdges:
-    get:
-      summary: get all the edges from the specified graph
+        - patient
+      summary: Logs patient into the system
       description: ''
-      tags:
-        - Graph
+      operationId: loginPatient
       parameters:
-        - in: path
-          name: graphName
+        - name: username
+          in: query
+          description: The user name for patient login
+          required: false
           schema:
             type: string
-          required: true
-          description: Name of the Graph
-      operationId: GraphGetEdges
+        - name: password
+          in: query
+          description: The password for patient login in clear text
+          required: false
+          schema:
+            type: string
       responses:
         '200':
-          description: Edges returned
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
           content:
+            application/xml:
+              schema:
+                type: string
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Edge'
-
-  /kb/graph/addEdge:
-    post:
-      summary: adds an Edge to the specified graph
-      description: ''
-      tags:
-        - Graph
-      operationId: GraphAddEdge
-      requestBody:
-        description: graph name, UUID of KB Token it is coming out of(source), UUID of KB Token it is going into(goal), label (optional)
-        required: true
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                graphName:
-                  type: "string"
-                parent:
-                  description: "UUID of the KB Token coming out of"
-                  type: "string"
-                  format: uuid
-                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-                  minLength: 36
-                  maxLength: 36
-                child:
-                  description: "UUID of the KB Token going into"
-                  type: "string"
-                  format: uuid
-                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-                  minLength: 36
-                  maxLength: 36
-                label:
-                  description: "label of the created edge (optional)"
-                  type: "string"
-      responses:
-        '200':
-          description: Edge added
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  result:
-                    type: "boolean"
-
-  /kb/graph/removeEdge:
-    post:
-      summary: removes the specified edge from the specified graph
-      description: ''
-      tags:
-        - Graph
-      operationId: GraphRemoveEdge
-      requestBody:
-        description: graph name, UUID of the edge to be deleted
-        required: true
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                graphName:
-                  type: "string"
-                UUID:
-                  description: "UUID of the Edge"
-                  type: "string"
-                  format: uuid
-                  pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-                  minLength: 36
-                  maxLength: 36
-      responses:
-        '200':
-          description: Edge removed
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  result:
-                    type: "boolean"
-
-  /kb/graph/addGraph:
-    post:
-      summary: adds a new (empty) graph to the blackboard
-      description: ''
-      tags:
-        - Graph
-      operationId: GraphAddGraph
-      requestBody:
-        description: graphName of the new Graph
-        required: true
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                graphName:
-                  type: "string"
-
-      responses:
-        '200':
-          description: Graph added
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  result:
-                    type: "boolean"
-
-  /kb/graph/getGraphNames:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /patient/logout:
     get:
-      summary: returns all the names of the graphs
-      description: ''
       tags:
-        - Graph
-      operationId: GraphGetGraphNames
+        - patient
+      summary: Logs out current logged in patient session
+      description: ''
+      operationId: logoutPatient
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /patient/{username}:
+    get:
+      tags:
+        - patient
+      summary: Get patient by user name
+      description: ''
+      operationId: getPatientByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Graph names returned
+          description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: "string"
+                $ref: '#/components/schemas/Patient'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - patient
+      summary: Update patient
+      description: This can only be done by the logged in patient.
+      operationId: updatePatient
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent patient
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - patient
+      summary: Delete patient
+      description: This can only be done by the logged in patient.
+      operationId: deletePatient
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+  /physiotherapist:
+    post:
+      tags:
+        - physiotherapist
+      summary: Create physiotherapist
+      description: This can only be done by the logged in user.
+      operationId: createPhysiotherapist
+      requestBody:
+        description: Created physiotherapist object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'
+  /physiotherapist/createWithList:
+    post:
+      tags:
+        - physiotherapist
+      summary: Creates list of physiotherapists with given input array
+      description: Creates list of physiotherapists with given input array
+      operationId: createPhysiotherapistWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Physiotherapist'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'
+        default:
+          description: successful operation
+  /physiotherapist/login:
+    get:
+      tags:
+        - physiotherapist
+      summary: Logs physiotherapist into the system
+      description: ''
+      operationId: loginPhysiotherapist
+      parameters:
+        - name: username
+          in: query
+          description: The user name for physiotherapist login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for physiotherapist login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /physiotherapist/logout:
+    get:
+      tags:
+        - physiotherapist
+      summary: Logs out current logged in physiotherapist session
+      description: ''
+      operationId: logoutPhysiotherapist
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /physiotherapist/{username}:
+    get:
+      tags:
+        - physiotherapist
+      summary: Get physiotherapist by user name
+      description: ''
+      operationId: getPhysiotherapistByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Physiotherapist'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - physiotherapist
+      summary: Update physiotherapist
+      description: This can only be done by the logged in physiotherapist.
+      operationId: updatePhysiotherapist
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent physiotherapist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - physiotherapist
+      summary: Delete physiotherapist
+      description: This can only be done by the logged in physiotherapist.
+      operationId: deletePhysiotherapist
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+components:
+  schemas:
+    Patient:
+      allOf:
+        - $ref: '#/components/schemas/Person'
+        - properties:
+            hobbies:
+              type: string
+              example: 'reading'
+            username:
+              type: string
+              example: patient01
+          xml:
+            name: patient
+    Physiotherapist:
+      allOf:
+        - $ref: '#/components/schemas/Person'
+        - properties:
+            yearsOfPactice:
+              type: integer
+              example: 12
+            username:
+              type: string
+              example: physiotherapist01
+          xml:
+            name: physiotherapist
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: user123
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        street:
+          type: string
+          example: Main Street
+        houseNumber:
+          type: string
+          example: '12A'
+        postalCode:
+          type: string
+          example: '12345'
+        city:
+          type: string
+          example: Berlin
+        phoneNumber:
+          type: string
+          example: '12345'
+        email:
+          type: string
+          format: email
+          example: john@email.com
+        dateOfBirth:
+          type: string
+          format: date
+          example: '1960-08-10'
+        gender:
+          type: string
+          example: male
+          enum:
+            - unknown
+            - male
+            - female
+            - other
+            - preferNotToSay
+        maritalStatus:
+          type: string
+          example: married
+          enum:
+            - unknown
+            - single
+            - married
+            - divorced
+            - widowed
+            - other
+            - preferNotToSay
+        password:
+          type: string
+          format: password
+          example: '12345'
+        noOfChildren:
+          type: integer
+          format: int32
+          example: 1
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+      xml:
+        name: person
+  requestBodies:
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Patient'
