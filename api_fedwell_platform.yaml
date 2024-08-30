@@ -11,8 +11,12 @@ tags:
     description: Operations about a patient
   - name: physiotherapist
     description: Operations about a physiotherapist
-  - name: excercise
+  - name: exercise
     description: Operations about an exercise
+  - name: exerciseSeries
+    description: Operations about an exercise series
+  - name: exerciseSeriesAssignment
+    description: Operations about an exercise series assignment
 paths:
   /patient:
     post:
@@ -69,6 +73,108 @@ paths:
                 $ref: '#/components/schemas/Patient'
         default:
           description: successful operation
+  /patient/{username}:
+    get:
+      tags:
+        - patient
+      summary: Get patient by user name
+      description: ''
+      operationId: getPatientByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - patient
+      summary: Update patient
+      description: This can only be done by the logged in patient.
+      operationId: updatePatient
+      parameters:
+        - name: username
+          in: path
+          description: user that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent patient
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      responses:
+        default:
+          description: successful operation
+    patch:
+      tags:
+        - patient
+      summary: Patially update patient
+      description: This can only be done by the logged in patient.
+      operationId: partiallyUpdatePatient
+      parameters:
+        - name: username
+          in: path
+          description: user that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Partially update an existent patient
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - patient
+      summary: Delete patient
+      description: This can only be done by the logged in patient.
+      operationId: deletePatient
+      parameters:
+        - name: username
+          in: path
+          description: user that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
   /patient/login:
     get:
       tags:
@@ -123,80 +229,6 @@ paths:
       responses:
         default:
           description: successful operation
-  /patient/{username}:
-    get:
-      tags:
-        - patient
-      summary: Get patient by user name
-      description: ''
-      operationId: getPatientByName
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched. Use user1 for testing. '
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Patient'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Patient'
-        '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-    put:
-      tags:
-        - patient
-      summary: Update patient
-      description: This can only be done by the logged in patient.
-      operationId: updatePatient
-      parameters:
-        - name: username
-          in: path
-          description: name that need to be deleted
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: Update an existent patient
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Patient'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Patient'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Patient'
-      responses:
-        default:
-          description: successful operation
-    delete:
-      tags:
-        - patient
-      summary: Delete patient
-      description: This can only be done by the logged in patient.
-      operationId: deletePatient
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
   /physiotherapist:
     post:
       tags:
@@ -250,60 +282,6 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Physiotherapist'
-        default:
-          description: successful operation
-  /physiotherapist/login:
-    get:
-      tags:
-        - physiotherapist
-      summary: Logs physiotherapist into the system
-      description: ''
-      operationId: loginPhysiotherapist
-      parameters:
-        - name: username
-          in: query
-          description: The user name for physiotherapist login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for physiotherapist login in clear text
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          headers:
-            X-Rate-Limit:
-              description: calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
-            X-Expires-After:
-              description: date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
-          content:
-            application/xml:
-              schema:
-                type: string
-            application/json:
-              schema:
-                type: string
-        '400':
-          description: Invalid username/password supplied
-  /physiotherapist/logout:
-    get:
-      tags:
-        - physiotherapist
-      summary: Logs out current logged in physiotherapist session
-      description: ''
-      operationId: logoutPhysiotherapist
-      parameters: []
-      responses:
         default:
           description: successful operation
   /physiotherapist/{username}:
@@ -362,6 +340,34 @@ paths:
       responses:
         default:
           description: successful operation
+    patch:
+      tags:
+        - physiotherapist
+      summary: Partially update physiotherapist
+      description: This can only be done by the logged in physiotherapist.
+      operationId: partiallyUpdatePhysiotherapist
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Partially update an existent physiotherapist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Physiotherapist'
+      responses:
+        default:
+          description: successful operation
     delete:
       tags:
         - physiotherapist
@@ -380,25 +386,453 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
+  /physiotherapist/login:
+    get:
+      tags:
+        - physiotherapist
+      summary: Logs physiotherapist into the system
+      description: ''
+      operationId: loginPhysiotherapist
+      parameters:
+        - name: username
+          in: query
+          description: The user name for physiotherapist login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for physiotherapist login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /physiotherapist/logout:
+    get:
+      tags:
+        - physiotherapist
+      summary: Logs out current logged in physiotherapist session
+      description: ''
+      operationId: logoutPhysiotherapist
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /exercise:
+    post:
+      tags:
+        - exercise
+      summary: Create exercise
+      description: This can only be done by the logged in physiotherapist.
+      operationId: createExercise
+      requestBody:
+        description: Created exercise object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+  /exercise/createWithList:
+    post:
+      tags:
+        - exercise
+      summary: Creates list of exercises with given input array
+      description: Creates list of exercises with given input array
+      operationId: createExerciseWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Exercise'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        default:
+          description: successful operation
+  /exercise/{exerciseId}:
+    get:
+      tags:
+        - exercise
+      summary: Get exercise by ID
+      description: ''
+      operationId: getExerciseById
+      parameters:
+        - name: exerciseId
+          in: path
+          description: 'The ID that needs to be fetched.'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Invalid exerciseId supplied
+        '404':
+          description: Exercise not found
+    put:
+      tags:
+        - exercise
+      summary: Update exercise
+      description: This can only be done by the logged in physiotherapist.
+      operationId: updateExercise
+      parameters:
+        - name: exerciseId
+          in: path
+          description: exercise that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent exercise
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+      responses:
+        default:
+          description: successful operation
+    patch:
+      tags:
+        - exercise
+      summary: Partially update exercise
+      description: This can only be done by the logged in physiotherapist.
+      operationId: partiallyUpdateExercise
+      parameters:
+        - name: exerciseId
+          in: path
+          description: exercise that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Partially update an existent exercise
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - exercise
+      summary: Delete exercise
+      description: This can only be done by the logged in physiotherapist.
+      operationId: deleteExercise
+      parameters:
+        - name: exerciseId
+          in: path
+          description: exercise that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid exerciseId supplied
+        '404':
+          description: Exercise not found
+  /exercise-series:
+    post:
+      tags:
+        - exerciseSeries
+      summary: Create exercise series
+      description: This can only be done by the logged in physiotherapist.
+      operationId: createExerciseSeries
+      requestBody:
+        description: Created exercise series object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeries'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeries'
+  /exercise-series/{exerciseSeriesId}:
+    get:
+      tags:
+        - exerciseSeries
+      summary: Get exercise series by ID
+      description: ''
+      operationId: getExerciseSeriesById
+      parameters:
+        - name: exerciseSeriesId
+          in: path
+          description: 'The ID that needs to be fetched.'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeries'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeries'
+        '400':
+          description: Invalid exerciseSeriesId supplied
+        '404':
+          description: Exercise series not found
+    put:
+      tags:
+        - exerciseSeries
+      summary: Update exercise series
+      description: This can only be done by the logged in physiotherapist.
+      operationId: updateExerciseSeries
+      parameters:
+        - name: exerciseSeriesId
+          in: path
+          description: exercise series that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent exercise series
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+      responses:
+        default:
+          description: successful operation
+    patch:
+      tags:
+        - exerciseSeries
+      summary: Partially update exercise series
+      description: This can only be done by the logged in physiotherapist.
+      operationId: partiallyUpdateExerciseSeries
+      parameters:
+        - name: exerciseSeriesId
+          in: path
+          description: exercise series that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Partially update an existent exercise series
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeries'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - exerciseSeries
+      summary: Delete exercise series
+      description: This can only be done by the logged in physiotherapist.
+      operationId: deleteExerciseSeries
+      parameters:
+        - name: exerciseSeriesId
+          in: path
+          description: exercise series that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid exerciseSeriesId supplied
+        '404':
+          description: Exercise series not found
+  /exercise-series-assignment:
+    post:
+      tags:
+        - exerciseSeriesAssignment
+      summary: Create exercise series assignment
+      description: This can only be done by the logged in physiotherapist.
+      operationId: createExerciseSeriesAssignment
+      requestBody:
+        description: Created exercise series assignment object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeriesAssignment'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeriesAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExerciseSeriesAssignment'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeriesAssignment'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeriesAssignment'
+  /exercise-series-assignment/{exerciseSeriesAssignmentId}:
+    get:
+      tags:
+        - exerciseSeriesAssignment
+      summary: Get exercise series assignment by ID
+      description: ''
+      operationId: getExerciseSeriesAssignmentById
+      parameters:
+        - name: exerciseSeriesAssignmentId
+          in: path
+          description: 'The ID that needs to be fetched.'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeriesAssignment'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExerciseSeriesAssignment'
+        '400':
+          description: Invalid exerciseSeriesId supplied
+        '404':
+          description: Exercise series not found
+    delete:
+      tags:
+        - exerciseSeriesAssignment
+      summary: Delete exercise series assignment
+      description: This can only be done by the logged in physiotherapist.
+      operationId: deleteExerciseSeriesAssignment
+      parameters:
+        - name: exerciseSeriesAssignmentId
+          in: path
+          description: exercise series assignment that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid exerciseSeriesAssignmentId supplied
+        '404':
+          description: Exercise series assignment not found
 components:
   schemas:
     Patient:
       allOf:
         - $ref: '#/components/schemas/Person'
         - properties:
-            hobbies:
-              type: string
-              example: 'reading'
             username:
               type: string
               example: patient01
+            lifestyleAndActivities:
+              $ref: '#/components/schemas/LifestyleAndActivities'
+            currentHealthStatus:
+              $ref: '#/components/schemas/CurrentHealthStatus'
+            anamnesis: 
+              $ref: '#/components/schemas/Anamnesis'
+            painAssessment:
+              $ref: '#/components/schemas/PainAssessment'
+            specificComplaints:
+              $ref: '#/components/schemas/SpecificComplaints'
+            pastTherapies:  
+              $ref: '#/components/schemas/PastTherapies'
+            other:  
+              $ref: '#/components/schemas/Other'
           xml:
             name: patient
     Physiotherapist:
       allOf:
         - $ref: '#/components/schemas/Person'
         - properties:
-            yearsOfPactice:
+            yearsOfPractice:
               type: integer
               example: 12
             username:
@@ -409,31 +843,30 @@ components:
     Person:
       type: object
       properties:
-        id:
+        userid:
           type: integer
           format: int64
           example: 10
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
         username:
           type: string
           example: user123
+        password:
+          type: string
+          format: password
+          example: '12345'
         firstName:
           type: string
           example: John
         lastName:
           type: string
           example: Doe
-        street:
-          type: string
-          example: Main Street
-        houseNumber:
-          type: string
-          example: '12A'
-        postalCode:
-          type: string
-          example: '12345'
-        city:
-          type: string
-          example: Berlin
+        adress:
+          $ref: '#/components/schemas/Adress'
         phoneNumber:
           type: string
           example: '12345'
@@ -465,21 +898,286 @@ components:
             - widowed
             - other
             - preferNotToSay
-        password:
-          type: string
-          format: password
-          example: '12345'
         noOfChildren:
           type: integer
           format: int32
           example: 1
-        userStatus:
-          type: integer
-          description: User Status
-          format: int32
-          example: 1
       xml:
         name: person
+    Adress:
+      type: object
+      properties:
+        street:
+          type: string
+          example: Main Street
+        houseNumber:
+          type: string
+          example: '12A'
+        postalCode:
+          type: string
+          example: '12345'
+        city:
+          type: string
+          example: Berlin
+    LifestyleAndActivities:
+      type: object
+      properties:
+        occupation:
+          type: string
+          example: Architect
+        occupationRole:
+          type: string
+          example: Project Manager
+        workdayDescription:
+          type: string
+          example: MostlySitting
+          enum:
+           - Unknown
+           - MostlySitting
+           - MostlyStanding
+           - PhysicalWork
+        hobbies:
+          type: string
+          example: reading
+        regularExercise:
+          type: boolean
+          example: true
+        exerciseDetails:
+          type: string
+          example: '1 hour walking per weekday'
+        smoking:
+          type: boolean
+          example: false
+        cigarettesPerDay:
+          type: string
+          example: '0'
+        alcohol:
+          type: boolean
+          example: false
+        alcoholFrequency:
+          type: string
+          example: 'no alcohol at all'
+      xml:
+        name: lifestyleAndActivities
+    CurrentHealthStatus:
+      type: object
+      properties:
+        currentPain:
+          type: boolean
+          example: true
+        painLocation:
+          type: string
+          example: right knee
+        complaintsDuration:
+          type: string
+          example: '2 weeks'
+        complaintsCause:
+          type: string
+          example: drop
+        complaintsOnset:
+          type: string
+          example: Suddenly
+          enum:
+           - Suddenly
+           - Gradually
+        pastComplaints:
+          type: boolean
+          example: false
+      xml:
+        name: currentHealthStatus
+    Anamnesis:
+      type: object
+      properties:
+        chronicDiseases:
+          type: boolean
+          example: false
+        chronicDiseasesDetails:
+          type: string
+          example: 'Diabetes Mellitus'
+        pastSurgeries:
+          type: boolean
+          example: false
+        pastSurgeriesDetails:
+          type: string
+          example: 'none'
+        medication:
+          type: boolean
+          example: false
+        medicationDetails:
+          type: string
+          example: 'none'
+        allergies:
+          type: boolean
+          example: false
+        allergiesDetails:
+          type: string
+          example: 'none'
+      xml:
+        name: anamnesis
+    PainAssessment:
+      type: object
+      properties:
+        painScale:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 10
+          example: 5
+        painDescription:
+          type: string
+          enum:
+           - Sharp
+           - Burning
+           - Pulling
+           - Pressing
+           - Other
+          example: 'Sharp'
+        painDescriptionDetails:
+          type: string
+          example: 'none'
+        painAggravatingRelievingFactors:
+          type: string
+          example: 'Fast movement of the lower right leg'
+        painAtRest:
+          type: boolean
+          example: false
+        painAtNight:
+          type: boolean
+          example: false
+      xml:
+        name: painAssessment
+    SpecificComplaints:
+      type: object
+      properties:
+        recentWeightChange:
+          type: boolean
+          example: false
+        weightChangeAmount:
+          type: string
+          example: '0 kg'
+        feverChills:
+          type: boolean
+          example: false
+        numbnessTingling:
+          type: boolean
+          example: true
+        bladderBowelControl:
+          type: boolean
+          example: false
+      xml:
+        name: specificComplaints
+    PastTherapies:
+      type: object
+      properties:
+        pastTherapy:
+          type: boolean
+          example: false
+        pastTherapyDetails:
+          type: string
+          example: 'none'
+        specificExercises:
+          type: boolean
+          example: false
+        specificExercisesDetails:
+          type: string
+          example: 'none'
+        pastTherapyEffect:
+          type: boolean
+          example: false
+        pastTherapyEffectDetails:
+          type: string
+          example: 'none'
+      xml:
+        name: pastTherapies
+    Other:
+      type: object
+      properties:
+        additionalInfo:
+          type: string
+          example: 'none'
+        therapyGoals:
+          type: string
+          example: 'fast recovery'
+      xml:
+        name: other
+    Exercise:
+      type: object
+      properties:
+        exerciseId:
+          type: integer
+          format: int64
+          example: 102572
+        exerciseName:
+          type: string
+          example: 'KneeLift'
+        exerciseDescription:
+          type: string
+          example: 'Lift your knee until the upper leg is horizontal, then return'
+        exerciseMedia:
+          type: string
+          example: 'none'
+        exerciseRepetitions:
+          type: integer
+          format: int32
+          example: 10
+        exerciseSets:
+          type: integer
+          format: int32
+          example: 3
+        exerciseWeight:
+          type: integer
+          format: int32
+          example: 0
+        exerciseNotes:
+          type: string
+          example: 'none'
+      xml:
+        name: exercise
+    ExerciseSeries:
+      type: object
+      properties:
+        exerciseSeriesId:
+          type: integer
+          format: int64
+          example: 987
+        exerciseSeriesName:
+          type: string
+          example: 'BasicKneeExercises'
+        exerciseSeriesDescription:
+          type: string
+          example: 'Light exercises for the knee'
+        exerciseOrder:
+          type: array
+          items:
+            type: integer
+            format: int64
+            example: 648651
+      xml:
+        name: exerciseSeries
+    ExerciseSeriesAssignment:
+      type: object
+      properties:
+        exerciseSeriesAssignmentId:
+          type: integer
+          format: int64
+          example: 7668
+        exerciseSeriesId:
+          type: integer
+          format: int64
+          example: 987
+        username:
+          type: string
+          example: 'patient01'
+        assignmentStartDate:
+          type: string
+          format: date
+          example: '2024-08-10'
+        assignmentEndDate:
+          type: string
+          format: date
+          example: '2024-09-10'
+      xml:
+        name: exerciseSeriesAssignmnet
   requestBodies:
     UserArray:
       description: List of user object
